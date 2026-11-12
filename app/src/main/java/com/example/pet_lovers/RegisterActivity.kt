@@ -76,7 +76,7 @@ class RegisterActivity : AppCompatActivity() {
                                     .getReference("users").child(uid)
                                     .setValue(sUser)
 
-                                startActivity(Intent(this@RegisterActivity, FeedActivity::class.java))
+                                startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
 
                             }
                             .addOnFailureListener {
