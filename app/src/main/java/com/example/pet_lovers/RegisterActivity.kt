@@ -1,3 +1,4 @@
+
 package com.example.pet_lovers
 
 import android.content.Intent
@@ -5,98 +6,134 @@ import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 
 class RegisterActivity : AppCompatActivity() {
 
-    lateinit var user: EditText
-
-    lateinit var email: EditText
-
-    lateinit var password: EditText
-
-    lateinit var confirm: EditText
+    private lateinit var user: EditText
+    private lateinit var email: EditText
+    private lateinit var password: EditText
+    private lateinit var confirm: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_register)
 
-        user = findViewById<EditText>(R.id.name)
-
-        email = findViewById<EditText>(R.id.email)
-
-        password = findViewById<EditText>(R.id.password)
-
-        confirm = findViewById<EditText>(R.id.ConfirmPassword)
+        user = findViewById(R.id.name)
+        email = findViewById(R.id.email)
+        password = findViewById(R.id.password)
+        confirm = findViewById(R.id.ConfirmPassword)
     }
 
     fun startFeed(view: View) {
-        val sUser = user.text.toString()
-        val sEmail = email.text.toString()
+
+        val sUser = user.text.toString().trim()
+        val sEmail = email.text.toString().trim()
         val sPassword = password.text.toString()
         val sConfirm = confirm.text.toString()
 
-        if (sPassword.length < 6){
-            Toast.makeText(this@RegisterActivity,
-                "pass must be 6 characters",
-                Toast.LENGTH_SHORT). show()
+        // Check empty fields
+        if (
+            sUser.isEmpty() ||
+            sEmail.isEmpty() ||
+            sPassword.isEmpty() ||
+            sConfirm.isEmpty()
+        ) {
+            Toast.makeText(
+                this,
+                "Please fill all fields",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
-        if (sPassword != sConfirm){
-            Toast.makeText( this@RegisterActivity,
-                "new pass and confirm pass doesn't match",
-                Toast.LENGTH_SHORT).show()
+
+        // Check password length
+        if (sPassword.length < 6) {
+            Toast.makeText(
+                this,
+                "Password must be at least 6 characters",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
         }
 
-        val addListener =
-            FirebaseDatabase.getInstance().getReference("users").orderByValue().equalTo(sUser)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
+        // Check password confirmation
+        if (sPassword != sConfirm) {
+            Toast.makeText(
+                this,
+                "Passwords do not match",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
 
-                        if(snapshot.exists()){
-                            Toast.makeText( this@RegisterActivity,
-                                "password already exits",
-                                Toast.LENGTH_SHORT).show()
-                            return
-                        }
-                        FirebaseAuth.getInstance().createUserWithEmailAndPassword(sEmail,sPassword)
-                            .addOnSuccessListener { result ->
-                                val uid = result.user!!.uid
-                                FirebaseDatabase.getInstance()
-                                    .getReference("users").child(uid)
-                                    .setValue(sUser)
+        // Create Firebase Authentication account
+        FirebaseAuth.getInstance()
+            .createUserWithEmailAndPassword(sEmail, sPassword)
 
-                                startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
+            .addOnSuccessListener { result ->
 
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText( this@RegisterActivity,
-                                    it.message,
-                                    Toast.LENGTH_SHORT).show()
-                            }
+                val uid = result.user?.uid
 
+                if (uid == null) {
+                    Toast.makeText(
+                        this,
+                        "Account creation failed",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@addOnSuccessListener
+                }
+
+                // Save username under the user's UID
+                FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .child(uid)
+                    .setValue(sUser)
+
+                    .addOnSuccessListener {
+
+                        Toast.makeText(
+                            this,
+                            "Registration successful",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        // Go to LoginActivity
+                        val intent = Intent(
+                            this,
+                            LoginActivity::class.java
+                        )
+
+                        startActivity(intent)
+                        finish()
                     }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText( this@RegisterActivity,
-                            error.message,
-                            Toast.LENGTH_SHORT).show()
+                    .addOnFailureListener { error ->
+
+                        Toast.makeText(
+                            this,
+                            "Database Error: ${error.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
-                })
+            }
 
+            .addOnFailureListener { error ->
 
+                Toast.makeText(
+                    this,
+                    "Registration Failed: ${error.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
     }
+
     fun loginPage(view: View) {
-        startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
+        startActivity(
+            Intent(this, LoginActivity::class.java)
+        )
+        finish()
     }
 }
