@@ -64,7 +64,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@color/material_dynamic_tertiary95"
                 android:paddingTop="30dp"
                 android:paddingLeft="15dp"
                 android:paddingBottom="20dp"
@@ -90,7 +89,7 @@
 
 
                 <TextView
-                    android:id="@+id/textView6"
+                    android:id="@+id/textVie"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="username"
@@ -135,7 +134,8 @@
                         android:text="Create Post"
                         android:textColor="@color/black"
                         android:gravity="center"
-                        android:layout_marginTop="5dp"/>
+                        android:layout_marginTop="5dp"
+                        android:onClick="startCreatePost"/>
 
 
                 </LinearLayout>

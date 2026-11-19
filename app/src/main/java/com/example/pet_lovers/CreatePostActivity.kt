@@ -30,6 +30,8 @@ class CreatePostActivity : AppCompatActivity() {
     private val cloudName = "roth1qua"
     private val uploadPreset = "pet_lovers"
 
+    var imageUri : Uri? = null
+
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()){
             uri: Uri? ->
@@ -40,7 +42,7 @@ class CreatePostActivity : AppCompatActivity() {
             }
         }
 
-    var imageUri : Uri? = null
+
 
 
         override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,10 +57,10 @@ class CreatePostActivity : AppCompatActivity() {
     }
     fun createPost(view: View) {
         iId = intent.getStringExtra("Id").toString()
-        iUsername= intent.getStringExtra("UserName").toString()
+        iUsername = intent.getStringExtra("UserName").toString()
         iEmail = intent.getStringExtra("Email").toString()
 
-        if (imageUri != null){
+        if (imageUri != null) {
             Toast.makeText(
                 this,
                 "Please select an images",
@@ -67,7 +69,7 @@ class CreatePostActivity : AppCompatActivity() {
 
             return
         }
-        if (caption.text.toString().length > 100){
+        if (caption.text.toString().length > 100) {
             Toast.makeText(
                 this,
                 "caption must be less then 100 characters",
@@ -76,12 +78,16 @@ class CreatePostActivity : AppCompatActivity() {
 
             return
 
-    }
+        }
         uploadImage()
-
-}
+    }
 
     private fun uploadImage() {
         TODO("Not yet implemented")
     }
+
+
+}
+
+
 
